@@ -6,6 +6,7 @@ using api.Data;
 using api.Extensions;
 using api.Models;
 using api.Repositories;
+using System.Diagnostics.CodeAnalysis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,3 +41,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+[ExcludeFromCodeCoverage]
+public abstract partial class Program 
+{
+    protected Program() { }
+}

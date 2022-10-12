@@ -15,7 +15,7 @@ public static class EndpointRouteBuilderExtensions
     {
         endpointRouteBuilder.MapGet("/insurance/{insuranceId}",
                     (
-                        IRepository<Insurance> insuranceRepository,
+                        [FromServices] IRepository<Insurance> insuranceRepository,
                         [FromRoute] int insuranceId,
                         CancellationToken cancellationToken) =>
                             insuranceRepository.GetById(insuranceId)
@@ -24,7 +24,7 @@ public static class EndpointRouteBuilderExtensions
                     .WithMetadata(new SwaggerOperationAttribute("Get insurance", "Get a insurance by id"));
         endpointRouteBuilder.MapGet("/insurance",
                     (
-                        IRepository<Insurance> insuranceRepository,
+                        [FromServices] IRepository<Insurance> insuranceRepository,
                         CancellationToken cancellationToken) =>
                             insuranceRepository.GetAll()
                     )
@@ -32,7 +32,7 @@ public static class EndpointRouteBuilderExtensions
                     .WithMetadata(new SwaggerOperationAttribute("Get insurances", "Get all insurances"));
         endpointRouteBuilder.MapPost("/insurance",
                     (
-                        IRepository<Insurance> insuranceRepository,
+                        [FromServices] IRepository<Insurance> insuranceRepository,
                         [FromBody] Insurance insurance,
                         CancellationToken cancellationToken) =>
                     {
@@ -44,7 +44,7 @@ public static class EndpointRouteBuilderExtensions
                     .WithMetadata(new SwaggerOperationAttribute("Insert insurance", "Insert an insurance"));
         endpointRouteBuilder.MapDelete("/insurance/{insuranceId}",
                     (
-                        IRepository<Insurance> insuranceRepository,
+                        [FromServices] IRepository<Insurance> insuranceRepository,
                         [FromRoute] int insuranceId,
                         CancellationToken cancellationToken) =>
                     {
@@ -56,7 +56,7 @@ public static class EndpointRouteBuilderExtensions
                     .WithMetadata(new SwaggerOperationAttribute("Delete insurance", "Delete an insurance"));
         endpointRouteBuilder.MapPut("/insurance",
                     (
-                        IRepository<Insurance> insuranceRepository,
+                        [FromServices] IRepository<Insurance> insuranceRepository,
                         [FromBody] Insurance insurance,
                         CancellationToken cancellationToken) =>
                     {

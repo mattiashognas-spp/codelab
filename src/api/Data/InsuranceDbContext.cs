@@ -27,7 +27,5 @@ public partial class InsuranceDbContext : DbContext
                 .HasForeignKey(e => e.ParentId)
                 .IsRequired(false);
         });
-
-        builder.Seed();
     }
 }
