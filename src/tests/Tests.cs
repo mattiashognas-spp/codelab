@@ -130,7 +130,7 @@ public class UnitTests : IClassFixture<WebApplicationFactory<Program>>, IDisposa
     }
 
     // Requirements:
-    // We need an endpoint that can return top combined values in insurances with depth restaints.
+    // We need an endpoint that can return top combined values in insurances with depth restraints.
     //
     // Rules:
     // - The Value property of the Insurance model is the property we like to combine for our results.
