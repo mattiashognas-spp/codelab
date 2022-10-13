@@ -20,6 +20,7 @@ public class UnitTests : IClassFixture<WebApplicationFactory<Program>>, IDisposa
     {
         this.factory = factory.WithWebHostBuilder(builder =>
         {
+            builder.UseTestServer();
             builder.ConfigureTestServices(services =>
             {
                 var serviceProvider = new ServiceCollection()
@@ -30,11 +31,12 @@ public class UnitTests : IClassFixture<WebApplicationFactory<Program>>, IDisposa
                     options.UseInMemoryDatabase("ApiInsuranceContextTesting");
                     options.UseInternalServiceProvider(serviceProvider);
                 });
-                using (var scope = factory.Server.Host.Services.CreateScope())
+                var sp = services.BuildServiceProvider();
+                using (var scope = sp.CreateScope())
                 {
-                    var db = scope.ServiceProvider.GetRequiredService<InsuranceDbContext>();
-                    var logger = scope.ServiceProvider
-                        .GetRequiredService<ILogger<WebApplicationFactory<Program>>>();
+                    var scopedServices = scope.ServiceProvider;
+                    var db = scopedServices.GetRequiredService<InsuranceDbContext>();
+                    var logger = scopedServices.GetRequiredService<ILogger<WebApplicationFactory<Program>>>();
                     db.Database.EnsureCreated();
                     try
                     {
@@ -113,6 +115,7 @@ public class UnitTests : IClassFixture<WebApplicationFactory<Program>>, IDisposa
                 ParentId = 8,
                 Value = 100
             });
+        db.SaveChanges();
     }
 
     public void Dispose()
@@ -129,34 +132,24 @@ public class UnitTests : IClassFixture<WebApplicationFactory<Program>>, IDisposa
         }
     }
 
-    // Requirements:
-    // We need an endpoint that can return top combined values in insurances with depth restraints.
-    //
-    // Rules:
-    // - The Value property of the Insurance model is the property we like to combine for our results.
-    // - We need to be able to set the maximum amount of returned values. Utilize the maxCount parameter.
-    // - We need to be able to limit the depth of children calulated. Utilize the maxDepth parameter.
-    //
-    // Seed data can be found in the Seed method. If you want to change it, feel free to do so.
-    // However, know that the "expectedValues" in the theory are based on initial seed data and could give you a hint toward the implementation.
     [Theory]
-    [InlineData(3, 2, new [] { 140000, 110000, 100100 })]
-    [InlineData(1, 3, new [] { 200000 })]
+    [InlineData(3, 2, new [] { 140000, 110100, 100100 })]
+    [InlineData(1, 3, new [] { 140000 })]
     public async Task When_I_request_insurances_containing_highest_value_with_children_all_combined_I_expect_to_get_correct_values(int maxCount, int maxDepth, int[] expectedValues)
     {
         // Arrange
         var client = factory.CreateClient();
 
         // Act
-        var response = await client.GetAsync($"https://localhost:443/insurance/top/{maxCount}/maxdepth/{maxDepth}");
+        var response = await client.GetAsync($"https://localhost:443/insurance/top/{maxCount}/{maxDepth}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-        var models = JsonSerializer.Deserialize<IEnumerable<Insurance>>(body, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        var models = JsonSerializer.Deserialize<IEnumerable<int>>(body, new JsonSerializerOptions(JsonSerializerDefaults.Web));
 
         models.Should().HaveCount(expectedValues.Count());
-        models!.Select(x => x.Value).Should().BeEquivalentTo(expectedValues);
+        models.Should().BeEquivalentTo(expectedValues);
     }
 }
