@@ -13,7 +13,7 @@ Each model has these properties:
 
 ```src\api``` project - this is where you add your implementation.
 
-```src\tests``` project - this has the requirements implemented as a test to verify the implementation.
+```src\tests``` project - this is where the requirements are implemented as a test to verify the implementation.
 
 ## Scenario
 We need an endpoint that can return top combined values in insurances with depth restraints.
@@ -24,6 +24,7 @@ We need an endpoint that can return top combined values in insurances with depth
  - We need to be able to limit the depth of sub-insurances calulated. Utilize the maxDepth parameter.
 
 ## Hints
-Seed data can be found in the Seed method. If you want to change it, feel free to do so.
-
-However, know that the "expectedValues" in the theory are based on initial seed data and could give you a hint toward the implementation.
+Seed data for the test can be found in the Seed method of the the ```Tests.cs``` class.
+If you want to change it, feel free to do so.
+However, know that the current theory is based on initial seed data.
+Changing test seed data could potentially break the theory.
